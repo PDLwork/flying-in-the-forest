@@ -1,4 +1,4 @@
-#include "mapping/gps.h"
+#include "gps.h"
 
 /*****************************************************************
 * initial_longitude and initial_latitude are in "deg" unit

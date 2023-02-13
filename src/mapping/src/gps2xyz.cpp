@@ -1,5 +1,5 @@
 #include <ros/ros.h>
-#include "mapping/gps.h"
+#include "gps.h"
 
 using namespace std;
 
@@ -8,7 +8,7 @@ int main(int argc, char **argv)
 	ros::init(argc, argv, "gpa_tran_node");
 	ros::NodeHandle nh;
 
-	double init_longitude = 113.3847256315;
+	double init_longitude = 112.3847256315;
 	double init_latitude  = 23.0685365248;
 	double init_altitude  = 30.0;
 	// 初始位置的GPS 原点坐标
