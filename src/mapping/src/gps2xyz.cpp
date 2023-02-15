@@ -1,5 +1,7 @@
 #include <ros/ros.h>
 #include <sensor_msgs/NavSatFix.h>
+#include <nav_msgs/Path.h>
+#include <geometry_msgs/PoseStamped.h>
 #include "gps.h"
 
 // 全局变量
@@ -7,6 +9,10 @@ double init_longitude;
 double init_latitude;
 double init_altitude;
 bool GPS_Initialization = false;
+
+// 存放轨迹记录的对象
+nav_msgs::Path Flight_trajectory;
+ros::Publisher trajectory_pub;
 
 // 存储的结构体
 GpsDataType gps;
@@ -38,6 +44,25 @@ void gps2ned_callback(const sensor_msgs::NavSatFix::ConstPtr& gps_msg)
 		ROS_INFO("x_north = %lf", ned.x_north);
 		ROS_INFO("y_east = %lf", ned.y_east);
 		ROS_INFO("z_down = %lf", ned.z_down);
+
+		//发布轨迹
+        Flight_trajectory.header.frame_id = "path";
+        Flight_trajectory.header.stamp = ros::Time::now();  
+
+        geometry_msgs::PoseStamped current_position;
+        current_position.header = Flight_trajectory.header;
+
+		// 取反一下  为了可以在rviz中更好的观察
+        current_position.pose.position.x = ned.x_north;
+        current_position.pose.position.y = -ned.y_east;
+        current_position.pose.position.z = -ned.z_down;
+
+        Flight_trajectory.poses.push_back(current_position);
+
+        // ROS_INFO("( x:%0.6f, y:%0.6f, z:%0.6f)", ned.x_north, ned.y_east, ned.z_down);
+
+		// 发布消息
+        trajectory_pub.publish(Flight_trajectory);
 	}
 	else
 	{
@@ -63,6 +88,9 @@ int main(int argc, char **argv)
 
 	// 订阅GPS话题
 	ros::Subscriber gps_sub = nh.subscribe("/airsim_node/drone_1/global_gps", 1, gps2ned_callback);
+
+	// 发布轨迹话题
+	trajectory_pub = nh.advertise<nav_msgs::Path>("Flight_trajectory", 10);
 
 	// 等待循环
 	ros::spin();
