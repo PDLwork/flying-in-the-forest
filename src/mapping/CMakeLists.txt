@@ -15,6 +15,10 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  tf2
+  tf2_geometry_msgs
+  tf2_ros
+  geometry_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -211,9 +215,9 @@ include_directories(
 # catkin_add_nosetests(test)
 
 add_executable(gps2xyz src/gps2xyz.cpp src/gps.cpp)
-
 add_dependencies(gps2xyz ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(gps2xyz ${catkin_LIBRARIES})
 
-target_link_libraries(gps2xyz
-  ${catkin_LIBRARIES}
-)
+add_executable(get_imu src/get_imu.cpp)
+add_dependencies(get_imu ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(get_imu ${catkin_LIBRARIES})
