@@ -19,6 +19,7 @@ find_package(catkin REQUIRED COMPONENTS
   tf2_geometry_msgs
   tf2_ros
   geometry_msgs
+  pcl_ros
 )
 
 ## System dependencies are found with CMake's conventions
@@ -221,3 +222,7 @@ target_link_libraries(gps2xyz ${catkin_LIBRARIES})
 add_executable(get_imu src/get_imu.cpp)
 add_dependencies(get_imu ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(get_imu ${catkin_LIBRARIES})
+
+add_executable(lidar src/lidar.cpp)
+add_dependencies(lidar ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(lidar ${catkin_LIBRARIES})
