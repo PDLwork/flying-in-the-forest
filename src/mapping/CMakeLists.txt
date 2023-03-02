@@ -226,3 +226,11 @@ target_link_libraries(get_imu ${catkin_LIBRARIES})
 add_executable(lidar src/lidar.cpp)
 add_dependencies(lidar ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(lidar ${catkin_LIBRARIES})
+
+add_executable(get_lidar_pose src/get_lidar_pose.cpp)
+add_dependencies(get_lidar_pose ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(get_lidar_pose ${catkin_LIBRARIES})
+
+add_executable(mapping1 src/mapping.cpp)
+add_dependencies(mapping1 ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(mapping1 ${catkin_LIBRARIES})
