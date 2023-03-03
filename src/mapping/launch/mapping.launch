@@ -2,4 +2,6 @@
 
     <node type="rviz" name="rviz" pkg="rviz" args="-d $(find mapping)/rviz/default.rviz" />
 
+    <node pkg="mapping" type="mapping1" name="" output="screen"/>
+
 </launch>  

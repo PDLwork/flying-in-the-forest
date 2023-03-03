@@ -41,7 +41,7 @@ if __name__ == '__main__':
     rate = rospy.Rate(10)
 
     output = PointCloud2()
-    output.header.frame_id = "world_enu"; 
+    output.header.frame_id = "world_enu"
     '''-------------------------------程序循环部分------------------------------------'''
     # while not rospy.is_shutdown():
     #     output.header.stamp = rospy.Time().now()
