@@ -1,27 +1,27 @@
-/*************************************************************
- *                    _ooOoo_
- *                   o8888888o
- *                   88" . "88
- *                   (| -_- |)
- *                    O\ = /O
- *                ____/`---'\____
- *              .   ' \\| |// `.
- *               / \\||| : |||// \
- *             / _||||| -:- |||||- \
- *               | | \\\ - /// | |
- *             | \_| ''\---/'' | |
- *              \ .-\__ `-` ___/-. /
- *           ___`. .' /--.--\ `. . __
- *        ."" '< `.___\_<|>_/___.' >'"".
- *       | | : `- \`.;`\ _ /`;.`/ - ` : | |
- *         \ \ `-. \_ __\ /__ _/ .-` / /
- * ======`-.____`-.___\_____/___.-`____.-'======
- *                    `=---='
- *  
- * .............................................
- *          佛祖保佑             永无BUG
- ***********************************************************/
-/**/
+                                    /***********************************************\
+                                    *                                               *
+                                    *                    _ooOoo_                    *
+                                    *                   o8888888o                   *
+                                    *                   88" . "88                   *
+                                    *                   (| -_- |)                   *
+                                    *                    O\ = /O                    *
+                                    *                ____/`---'\____                *
+                                    *              .   ' \\| |// `.                 *
+                                    *               / \\||| : |||// \               *
+                                    *             / _||||| -:- |||||- \             *
+                                    *               | | \\\ - /// | |               *
+                                    *             | \_| ''\---/'' | |               *
+                                    *              \ .-\__ `-` ___/-. /             *
+                                    *           ___`. .' /--.--\ `. . __            *
+                                    *        ."" '< `.___\_<|>_/___.' >'"".         *
+                                    *       | | : `- \`.;`\ _ /`;.`/ - ` : | |      *
+                                    *         \ \ `-. \_ __\ /__ _/ .-` / /         *
+                                    * ======`-.____`-.___\_____/___.-`____.-'====== *
+                                    *                    `=---='                    *
+                                    *                                               *
+                                    * ............................................. *
+                                    *          佛祖保佑             永无BUG           *
+                                    \***********************************************/
 
 // 导入标准库
 #include <ros/ros.h>
@@ -29,6 +29,8 @@
 #include <pcl/point_cloud.h>
 #include <pcl_conversions/pcl_conversions.h> 
 #include <pcl/common/transforms.h>
+#include <pcl/filters/statistical_outlier_removal.h>
+#include <pcl/filters/voxel_grid.h>
 
 // 导入消息文件
 #include <sensor_msgs/PointCloud2.h>
@@ -45,38 +47,53 @@ tf2_ros::Buffer buffer;
 void lidar_Callback(const sensor_msgs::PointCloud2::ConstPtr & lidar_msg)
 {
     try
-        {
-            // 获取两个坐标系之间的关系
-            geometry_msgs::TransformStamped tfs = buffer.lookupTransform("world_ned","drone_1/LidarSensor",ros::Time(0), ros::Duration(0.5));
+    {
+        // 获取两个坐标系之间的关系
+        geometry_msgs::TransformStamped tfs = buffer.lookupTransform("world_ned","drone_1/LidarSensor",ros::Time(0), ros::Duration(0.5));
 
-            // 需要添加头文件#include <pcl_conversions/pcl_conversions.h>
-            pcl::PointCloud<pcl::PointXYZ>::Ptr temp_PointCloud(new pcl::PointCloud<pcl::PointXYZ>);
-            pcl::fromROSMsg(*lidar_msg, *temp_PointCloud);
+        // 需要添加头文件#include <pcl_conversions/pcl_conversions.h>
+        pcl::PointCloud<pcl::PointXYZ>::Ptr temp_PointCloud(new pcl::PointCloud<pcl::PointXYZ>);
+        pcl::fromROSMsg(*lidar_msg, *temp_PointCloud);
 
-            //定义旋转矩阵
-            Eigen::Affine3f transform = Eigen::Affine3f::Identity();
-            transform.translation() << tfs.transform.translation.x, tfs.transform.translation.y, tfs.transform.translation.z;   //平移向量
+        pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_filter(new pcl::PointCloud<pcl::PointXYZ>);
+        pcl::StatisticalOutlierRemoval<pcl::PointXYZ> Statistical_filter;
+        Statistical_filter.setInputCloud(temp_PointCloud);
+        Statistical_filter.setMeanK(50); //K近邻搜索点个数
+        Statistical_filter.setStddevMulThresh(1.0); //标准差倍数
+        Statistical_filter.setNegative(false); //保留未滤波点（内点）
+        Statistical_filter.filter(*cloud_filter);  //保存滤波结果到cloud_filter
 
-            Eigen::Quaterniond temp_qaternion(tfs.transform.rotation.w, tfs.transform.rotation.x, tfs.transform.rotation.y, tfs.transform.rotation.z);     //四元数转旋转矩阵
-            transform.rotate(temp_qaternion.matrix().cast<float>());
+        //定义旋转矩阵
+        Eigen::Affine3f transform = Eigen::Affine3f::Identity();
+        transform.translation() << tfs.transform.translation.x, tfs.transform.translation.y, tfs.transform.translation.z;   //平移向量
 
-            // 执行变换，并将结果保存在新创建的 transformed_cloud 中
-            pcl::PointCloud<pcl::PointXYZ>::Ptr transformed_cloud (new pcl::PointCloud<pcl::PointXYZ>);
-            pcl::transformPointCloud(*temp_PointCloud, *transformed_cloud, transform);
+        Eigen::Quaterniond temp_qaternion(tfs.transform.rotation.w, tfs.transform.rotation.x, tfs.transform.rotation.y, tfs.transform.rotation.z);     //四元数转旋转矩阵
+        transform.rotate(temp_qaternion.matrix().cast<float>());
 
-            // 合并点云
-            *pdl_map = *pdl_map + *transformed_cloud;
+        // 执行变换，并将结果保存在新创建的 transformed_cloud 中
+        pcl::PointCloud<pcl::PointXYZ>::Ptr transformed_cloud (new pcl::PointCloud<pcl::PointXYZ>);
+        pcl::transformPointCloud(*cloud_filter, *transformed_cloud, transform);
 
-            //转换成ros消息发布 
-            pcl::toROSMsg(*pdl_map, output);
-            output.header.frame_id = "world_ned";
-            pub.publish (output);
-        }
-        catch(const std::exception& e)
-        {
-            // std::cerr << e.what() << '\n';
-            ROS_INFO("error:%s",e.what());
-        }
+        // 合并点云
+        *pdl_map += *transformed_cloud;
+
+        pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_filter1(new pcl::PointCloud<pcl::PointXYZ>);
+        pcl::VoxelGrid<pcl::PointXYZ> Voxel_filter;
+        Voxel_filter.setInputCloud (pdl_map);
+        Voxel_filter.setLeafSize (0.05f, 0.05f, 0.05f);// 单位：m
+        Voxel_filter.filter (*cloud_filter1);
+
+        //转换成ros消息发布 
+        pcl::toROSMsg(*cloud_filter1, output);
+        output.header.frame_id = "world_ned";
+        pub.publish (output);
+        
+    }
+    catch(const std::exception& e)
+    {
+        // std::cerr << e.what() << '\n';
+        ROS_INFO("error:%s",e.what());
+    }
 
 }
 
