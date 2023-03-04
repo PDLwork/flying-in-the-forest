@@ -109,7 +109,7 @@ Visualization Manager:
       Color: 255; 255; 255
       Color Transformer: RGB8
       Decay Time: 0
-      Enabled: true
+      Enabled: false
       Invert Rainbow: false
       Max Color: 255; 255; 255
       Min Color: 0; 0; 0
@@ -124,7 +124,7 @@ Visualization Manager:
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
-      Value: true
+      Value: false
     - Angle Tolerance: 0.10000000149011612
       Class: rviz/Odometry
       Covariance:
@@ -142,7 +142,7 @@ Visualization Manager:
           Scale: 1
           Value: true
         Value: true
-      Enabled: true
+      Enabled: false
       Keep: 25
       Name: Odometry
       Position Tolerance: 0.10000000149011612
@@ -159,18 +159,18 @@ Visualization Manager:
         Value: Arrow
       Topic: /airsim_node/MyQuad/odom_local_ned
       Unreliable: false
-      Value: true
+      Value: false
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: 10
-        Min Value: -10
+        Max Value: 0.8385363221168518
+        Min Value: -1.6736985445022583
         Value: true
       Axis: Z
       Channel Name: intensity
       Class: rviz/PointCloud2
       Color: 255; 255; 255
-      Color Transformer: Intensity
+      Color Transformer: AxisColor
       Decay Time: 0
       Enabled: true
       Invert Rainbow: false
@@ -183,7 +183,7 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.009999999776482582
       Style: Flat Squares
-      Topic: /output/Lidar
+      Topic: /world_map/pointcloud
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
@@ -200,7 +200,7 @@ Visualization Manager:
     - Alpha: 1
       Buffer Length: 1
       Class: rviz/Path
-      Color: 25; 255; 0
+      Color: 164; 0; 0
       Enabled: true
       Head Diameter: 0.30000001192092896
       Head Length: 0.20000000298023224
@@ -218,7 +218,7 @@ Visualization Manager:
       Radius: 0.029999999329447746
       Shaft Diameter: 0.10000000149011612
       Shaft Length: 0.10000000149011612
-      Topic: /Flight_trajectory
+      Topic: /flight_path_record
       Unreliable: false
       Value: true
   Enabled: true
@@ -249,7 +249,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 18.22313117980957
+      Distance: 30.206661224365234
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -257,17 +257,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 0.08613172918558121
-        Y: 0.2811238765716553
-        Z: -0.7929707169532776
+        X: -2.660069465637207
+        Y: 3.8838000297546387
+        Z: 3.5077672004699707
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.9947971105575562
+      Pitch: 0.38479775190353394
       Target Frame: world_view
-      Yaw: 3.070377826690674
+      Yaw: 4.685379981994629
     Saved: ~
 Window Geometry:
   Displays:

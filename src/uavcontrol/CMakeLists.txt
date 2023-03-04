@@ -1,25 +1,16 @@
 cmake_minimum_required(VERSION 3.0.2)
-#使用的最低版本
-project(mapping)
-#功能包名称  实际上就是这个名字 而不是文件夹名
+project(uavcontrol)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-#编译为c++ 11，在ROS Kinetic和更新的版本中支持       Compile（编译）
 # add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
-#查找catkin macros和libraries  库可以理解，但是那个catkin macros是啥
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
-  rospy
+  rpspy
   std_msgs
-  tf2
-  tf2_geometry_msgs
-  tf2_ros
-  geometry_msgs
-  pcl_ros
 )
 
 ## System dependencies are found with CMake's conventions
@@ -113,10 +104,9 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES mapping
-#  CATKIN_DEPENDS roscpp rospy std_msgs
+#  LIBRARIES uavcontrol
+#  CATKIN_DEPENDS roscpp rpspy std_msgs
 #  DEPENDS system_lib
-CATKIN_DEPENDS roscpp rospy std_msgs
 )
 
 ###########
@@ -126,13 +116,13 @@ CATKIN_DEPENDS roscpp rospy std_msgs
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-  include
+# include
   ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/mapping.cpp
+#   src/${PROJECT_NAME}/uavcontrol.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -143,7 +133,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/mapping_node.cpp)
+# add_executable(${PROJECT_NAME}_node src/uavcontrol_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -207,26 +197,10 @@ include_directories(
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_mapping.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_uavcontrol.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
-
-add_executable(gps2xyz src/gps2xyz.cpp src/gps.cpp)
-add_dependencies(gps2xyz ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(gps2xyz ${catkin_LIBRARIES})
-
-add_executable(get_imu src/get_imu.cpp)
-add_dependencies(get_imu ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(get_imu ${catkin_LIBRARIES})
-
-add_executable(mapping src/mapping.cpp)
-add_dependencies(mapping ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(mapping ${catkin_LIBRARIES})
-
-add_executable(flight_path_record src/flight_path_record.cpp)
-add_dependencies(flight_path_record ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(flight_path_record ${catkin_LIBRARIES})

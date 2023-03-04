@@ -1,7 +1,11 @@
 <launch>
 
-    <node type="rviz" name="rviz" pkg="rviz" args="-d $(find mapping)/rviz/default.rviz" />
+    <param name="/take_off_flag"    value="0" />
 
-    <node pkg="mapping" type="mapping1" name="" output="screen"/>
+    <node pkg="rviz"    type="rviz"                 name=""     args="-d $(find mapping)/rviz/default.rviz" />
+
+    <node pkg="mapping" type="mapping"              name=""     output="screen"/>
+
+    <node pkg="mapping" type="flight_path_record"   name=""     output="screen"/>
 
 </launch>  

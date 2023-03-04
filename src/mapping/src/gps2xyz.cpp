@@ -1,3 +1,5 @@
+/*这个文件参杂了好多东西，也算是学习过程吧*/
+
 #include <ros/ros.h>
 #include <sensor_msgs/NavSatFix.h>
 #include <nav_msgs/Path.h>
@@ -18,7 +20,7 @@ bool GPS_Initialization = false;
 
 // 存放轨迹记录的对象
 nav_msgs::Path Flight_trajectory;
-ros::Publisher trajectory_pub;
+ros::Publisher Flight_trajectory_pub;
 
 // 存储的结构体
 GpsDataType gps;
@@ -80,7 +82,7 @@ void gps2ned_callback(const sensor_msgs::NavSatFix::ConstPtr& gps_msg)
         Flight_trajectory.poses.push_back(current_position);
 
 		// 发布消息
-        trajectory_pub.publish(Flight_trajectory);
+        Flight_trajectory_pub.publish(Flight_trajectory);
 	}
 	else
 	{
@@ -154,7 +156,7 @@ int main(int argc, char **argv)
 	// ros::Subscriber IMU_sub = nh.subscribe("/airsim_node/drone_1/imu/imu", 1, get_imu_callback);
 
 	// 发布轨迹话题
-	trajectory_pub = nh.advertise<nav_msgs::Path>("Flight_trajectory", 10);
+	Flight_trajectory_pub = nh.advertise<nav_msgs::Path>("Flight_trajectory", 10);
 
 	// 等待循环
 	ros::spin();

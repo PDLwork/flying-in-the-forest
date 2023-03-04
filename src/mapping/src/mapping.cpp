@@ -21,7 +21,14 @@
                                     *                                               *
                                     * ............................................. *
                                     *          佛祖保佑             永无BUG           *
-                                    \***********************************************/   
+                                    \***********************************************/
+
+/*
+节点功能：
+读取雷达点云以及雷达位姿转换成世界坐标下的点云
+发布世界坐标下的点云，可以在rviz中显示
+*/
+
 
 // 导入标准库
 #include <ros/ros.h>
@@ -50,7 +57,7 @@ void lidar_Callback(const sensor_msgs::PointCloud2::ConstPtr & lidar_msg)
     try
     {
         // 获取两个坐标系之间的关系，用来获取雷达的位姿
-        geometry_msgs::TransformStamped tfs = buffer.lookupTransform("world_ned","drone_1/LidarSensor",ros::Time(0), ros::Duration(0.5));
+        geometry_msgs::TransformStamped tfs = buffer.lookupTransform("world_ned","drone_1/LidarSensor",ros::Time(0), ros::Duration(0.1));
 
 
         // 开辟一个临时存储点云空间，存储当前雷达点云数据
@@ -92,9 +99,10 @@ void lidar_Callback(const sensor_msgs::PointCloud2::ConstPtr & lidar_msg)
         // 实例化滤波器并设置参数
         pcl::VoxelGrid<pcl::PointXYZ> Voxel_filter;
         Voxel_filter.setLeafSize (0.05f, 0.05f, 0.05f);// 单位：m
-        // 输入点云并降采样，存储在cloud_voxelgrid_filter中
+        // 输入点云并降采样，存储在cloud_voxelgrid_filter中,再转移到world_map中
         Voxel_filter.setInputCloud (world_map);
         Voxel_filter.filter (*cloud_voxelgrid_filter);
+        world_map.swap(cloud_voxelgrid_filter);
 
 
         sensor_msgs::PointCloud2 world_map_output;   //定义消息类型
@@ -122,7 +130,7 @@ int main(int argc, char *argv[])
     ros::Subscriber person_info_sub = nh.subscribe("/airsim_node/drone_1/lidar/LidarSensor", 10, lidar_Callback);
 
     // 用于发布世界雷达地图
-    pub = nh.advertise<sensor_msgs::PointCloud2> ("/output/Lidar", 10);
+    pub = nh.advertise<sensor_msgs::PointCloud2> ("/world_map/pointcloud", 10);
 
     // 订阅TF树
     tf2_ros::TransformListener listener(buffer);
