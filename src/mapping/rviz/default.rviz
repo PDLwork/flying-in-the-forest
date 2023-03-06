@@ -7,6 +7,7 @@ Panels:
         - /TF1/Frames1
         - /Odometry1/Shape1
         - /PointCloud21
+        - /OccupancyGrid1
       Splitter Ratio: 0.5051546096801758
     Tree Height: 661
   - Class: rviz/Selection
@@ -163,8 +164,8 @@ Visualization Manager:
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: 0.8385363221168518
-        Min Value: -1.6736985445022583
+        Max Value: 2.310887098312378
+        Min Value: -0.7572885155677795
         Value: true
       Axis: Z
       Channel Name: intensity
@@ -172,7 +173,7 @@ Visualization Manager:
       Color: 255; 255; 255
       Color Transformer: AxisColor
       Decay Time: 0
-      Enabled: true
+      Enabled: false
       Invert Rainbow: false
       Max Color: 255; 255; 255
       Min Color: 0; 0; 0
@@ -187,7 +188,7 @@ Visualization Manager:
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
-      Value: true
+      Value: false
     - Alpha: 1
       Class: rviz/Axes
       Enabled: false
@@ -221,6 +222,18 @@ Visualization Manager:
       Topic: /flight_path_record
       Unreliable: false
       Value: true
+    - Class: octomap_rviz_plugin/OccupancyGrid
+      Enabled: true
+      Max. Height Display: 3.4028234663852886e+38
+      Max. Octree Depth: 16
+      Min. Height Display: -3.4028234663852886e+38
+      Name: OccupancyGrid
+      Octomap Topic: /octomap_full
+      Queue Size: 5
+      Value: true
+      Voxel Alpha: 1
+      Voxel Coloring: Z-Axis
+      Voxel Rendering: Occupied Voxels
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -249,7 +262,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 30.206661224365234
+      Distance: 19.620819091796875
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -257,17 +270,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: -2.660069465637207
-        Y: 3.8838000297546387
-        Z: 3.5077672004699707
+        X: -0.30710822343826294
+        Y: 0.9063737392425537
+        Z: -1.9253509044647217
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.38479775190353394
+      Pitch: 0.5447982549667358
       Target Frame: world_view
-      Yaw: 4.685379981994629
+      Yaw: 5.465454578399658
     Saved: ~
 Window Geometry:
   Displays:

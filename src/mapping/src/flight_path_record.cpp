@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
     {
         try
         {
-            geometry_msgs::TransformStamped tfs = buffer.lookupTransform("world_ned","drone_1",ros::Time(0), ros::Duration(0.5));
+            geometry_msgs::TransformStamped tfs = buffer.lookupTransform("world_ned","drone_1/LidarSensor",ros::Time(0), ros::Duration(0.5));
 
             geometry_msgs::PoseStamped current_position;
             current_position.pose.position.x = tfs.transform.translation.x;
