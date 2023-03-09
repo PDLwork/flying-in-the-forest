@@ -27,7 +27,7 @@ Panels:
   - Class: rviz/Time
     Name: Time
     SyncMode: 0
-    SyncSource: PointCloud2
+    SyncSource: ""
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -58,6 +58,8 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
+        LidarSensor1:
+          Value: true
         bottom_center_body:
           Value: true
         bottom_center_body/static:
@@ -80,6 +82,8 @@ Visualization Manager:
           Value: true
         front_center_optical/static:
           Value: true
+        map:
+          Value: true
         world_enu:
           Value: true
         world_ned:
@@ -93,7 +97,28 @@ Visualization Manager:
       Tree:
         world_ned:
           drone_1:
-            {}
+            bottom_center_body:
+              {}
+            bottom_center_optical:
+              {}
+            drone_1/odom_local_ned:
+              bottom_center_body/static:
+                {}
+              bottom_center_optical/static:
+                {}
+              drone_1/LidarSensor:
+                {}
+              front_center_body/static:
+                {}
+              front_center_optical/static:
+                {}
+            front_center_body:
+              {}
+            front_center_optical:
+              {}
+          map:
+            LidarSensor1:
+              {}
           world_enu:
             {}
       Update Interval: 0
@@ -262,7 +287,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 19.620819091796875
+      Distance: 27.565837860107422
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -278,9 +303,9 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.5447982549667358
+      Pitch: 0.9447978734970093
       Target Frame: world_view
-      Yaw: 5.465454578399658
+      Yaw: 4.73045539855957
     Saved: ~
 Window Geometry:
   Displays:

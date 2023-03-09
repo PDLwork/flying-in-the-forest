@@ -230,3 +230,7 @@ target_link_libraries(mapping ${catkin_LIBRARIES})
 add_executable(flight_path_record src/flight_path_record.cpp)
 add_dependencies(flight_path_record ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(flight_path_record ${catkin_LIBRARIES})
+
+add_executable(tf_tree src/tf_tree.cpp)
+add_dependencies(tf_tree ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(tf_tree ${catkin_LIBRARIES})

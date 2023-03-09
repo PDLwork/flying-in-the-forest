@@ -38,12 +38,15 @@
 #include <pcl/common/transforms.h>
 #include <pcl/filters/statistical_outlier_removal.h>
 #include <pcl/filters/voxel_grid.h>
+#include <tf2_ros/transform_broadcaster.h>
 
 // 导入消息文件
 #include <sensor_msgs/PointCloud2.h>
 
-ros::Publisher pub;     //声明发布对象，这样可以在回调函数里面发布
+ros::Publisher world_pointcloud_publisher;     //声明发布对象，这样可以在回调函数里面发布
 pcl::PointCloud<pcl::PointXYZ>::Ptr world_map (new pcl::PointCloud<pcl::PointXYZ>);   //存储世界地图点云
+
+ros::Publisher lidar_pointcloud_publisher;      //声明发布对象，这样可以在回调函数里面发布,发布雷达点云，用来建八叉树地图，原来的用不了
 
 // 创建 TF 订阅对象
 // 导入的"tf2_ros/transform_listener.h"
@@ -82,6 +85,28 @@ void lidar_Callback(const sensor_msgs::PointCloud2::ConstPtr & lidar_msg)
             Statistical_filter.filter(*cloud_statistical_filter);  //保存滤波结果到cloud_statistical_filter
 
 
+            // 这个部分后期需要修改  目前为了理解还是先放在这里
+            // 发布雷达相对/map的位姿态
+            static tf2_ros::TransformBroadcaster broadcaster;
+            geometry_msgs::TransformStamped tfs1;
+            tfs1.header.frame_id = "map";
+            tfs1.header.stamp = ros::Time::now();
+            tfs1.child_frame_id = "LidarSensor1";
+            tfs1.transform.translation.x = tfs.transform.translation.x;
+            tfs1.transform.translation.y = tfs.transform.translation.y;
+            tfs1.transform.translation.z = tfs.transform.translation.z;
+            tfs1.transform.rotation.x = tfs.transform.rotation.x;
+            tfs1.transform.rotation.y = tfs.transform.rotation.y;
+            tfs1.transform.rotation.z = tfs.transform.rotation.z;
+            tfs1.transform.rotation.w = tfs.transform.rotation.w;
+            broadcaster.sendTransform(tfs1);
+            // 发布雷达点云，用来建八叉树地图，原来的用不了
+            sensor_msgs::PointCloud2 lidar_pointcloud_output;   //定义消息类型
+            pcl::toROSMsg(*cloud_statistical_filter, lidar_pointcloud_output);
+            lidar_pointcloud_output.header.frame_id = "LidarSensor1";     //设置在rviz中显示的坐标系
+            lidar_pointcloud_publisher.publish (lidar_pointcloud_output);
+
+
             //由雷达位姿定义旋转矩阵 将雷达采集点云转换为世界坐标下的点云
             Eigen::Affine3f transform = Eigen::Affine3f::Identity();    //实例化旋转矩阵并设置为单位阵
             transform.translation() << tfs.transform.translation.x, tfs.transform.translation.y, tfs.transform.translation.z;   //平移向量
@@ -112,7 +137,7 @@ void lidar_Callback(const sensor_msgs::PointCloud2::ConstPtr & lidar_msg)
             //将点云转换成可以发布的ros消息并发布
             pcl::toROSMsg(*world_map, world_map_output);
             world_map_output.header.frame_id = "world_ned";     //设置在rviz中显示的坐标系
-            pub.publish (world_map_output);
+            world_pointcloud_publisher.publish (world_map_output);
         }
         catch(const std::exception& e)
         {
@@ -126,14 +151,15 @@ int main(int argc, char *argv[])
 {
     /*******************************初始化部分***********************************/
     setlocale(LC_ALL,"");
-    ros::init(argc, argv, "mapping_1");
+    ros::init(argc, argv, "mapping");
     ros::NodeHandle nh;
     
     // 订阅来自雷达的消息
     ros::Subscriber person_info_sub = nh.subscribe("/airsim_node/drone_1/lidar/LidarSensor", 10, lidar_Callback);
 
     // 用于发布世界雷达地图
-    pub = nh.advertise<sensor_msgs::PointCloud2> ("/world_map/pointcloud", 10);
+    world_pointcloud_publisher = nh.advertise<sensor_msgs::PointCloud2> ("/world_map/pointcloud", 10);
+    lidar_pointcloud_publisher = nh.advertise<sensor_msgs::PointCloud2> ("/Lidar/pointcloud", 10);
 
     // 订阅TF树
     tf2_ros::TransformListener listener(buffer);
