@@ -1,3 +1,8 @@
+/*
+节点功能：
+发布各个坐标系的TF树关系
+*/
+
 // 导入标准库
 #include <ros/ros.h>
 #include <tf2_ros/static_transform_broadcaster.h>
@@ -5,7 +10,7 @@
 
 int main(int argc, char *argv[])
 {
-    ros::init(argc,argv,"uav_brocast");
+    ros::init(argc,argv,"tf_tree");
     tf2_ros::StaticTransformBroadcaster static_broadcaster_map2word_ned;
     geometry_msgs::TransformStamped tfs_map2word_ned;
     tfs_map2word_ned.header.seq = 100;

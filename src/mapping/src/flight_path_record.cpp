@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
 {
     /*******************************初始化部分***********************************/
     ros::init(argc, argv, "flight_path_record");
-	ros::NodeHandle nh;
+    ros::NodeHandle nh;
 
     // 创建 TF 订阅对象
     // 导入的"tf2_ros/transform_listener.h"
