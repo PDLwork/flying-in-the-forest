@@ -1,18 +1,29 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(uavcontrol)
+#使用的最低版本
+project(yundebug)
+#功能包名称  实际上就是这个名字 而不是文件夹名
+
+
+set(octomap_DIR /opt/ros/noetic/share/octomap)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
+#编译为c++ 11，在ROS Kinetic和更新的版本中支持       Compile（编译）
 # add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
+#查找catkin macros和libraries  库可以理解，但是那个catkin macros是啥
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
-  message_generation
+  tf2
+  tf2_geometry_msgs
+  tf2_ros
   geometry_msgs
+  pcl_ros
+  octomap
 )
 
 ## System dependencies are found with CMake's conventions
@@ -49,18 +60,18 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-add_message_files(
-  FILES
-  VelCmd.msg
-  PoseCmd.msg
-)
+# add_message_files(
+#   FILES
+#   Message1.msg
+#   Message2.msg
+# )
 
 ## Generate services in the 'srv' folder
-add_service_files(
-  FILES
-  Takeoff.srv
-  Land.srv
-)
+# add_service_files(
+#   FILES
+#   Service1.srv
+#   Service2.srv
+# )
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -70,11 +81,10 @@ add_service_files(
 # )
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  std_msgs
-  geometry_msgs
-)
+# generate_messages(
+#   DEPENDENCIES
+#   std_msgs
+# )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -107,10 +117,10 @@ generate_messages(
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES uavcontrol
-#  CATKIN_DEPENDS roscpp rpspy std_msgs
+#  LIBRARIES mapping
+#  CATKIN_DEPENDS roscpp rospy std_msgs
 #  DEPENDS system_lib
-CATKIN_DEPENDS roscpp rospy std_msgs message_runtime 
+CATKIN_DEPENDS roscpp rospy std_msgs
 )
 
 ###########
@@ -126,7 +136,7 @@ include_directories(
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/uavcontrol.cpp
+#   src/${PROJECT_NAME}/mapping.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -137,7 +147,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/uavcontrol_node.cpp)
+# add_executable(${PROJECT_NAME}_node src/mapping_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -201,7 +211,7 @@ include_directories(
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_uavcontrol.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_mapping.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
@@ -209,10 +219,25 @@ include_directories(
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 
-add_executable(keyboard_control src/keyboard_control.cpp)
-add_dependencies(keyboard_control ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(keyboard_control ${catkin_LIBRARIES})
+add_executable(save_octomap src/save_octomap.cpp)
+add_dependencies(save_octomap ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(save_octomap ${catkin_LIBRARIES})
 
-add_executable(wcg src/wcg.cpp)
-add_dependencies(wcg ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(wcg ${catkin_LIBRARIES})
+add_executable(static_tf src/static_tf.cpp)
+add_dependencies(static_tf ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(static_tf ${catkin_LIBRARIES})
+
+add_executable(RRT_Start_test src/RRT_Start_test.cpp)
+add_dependencies(RRT_Start_test ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(RRT_Start_test 
+  ${catkin_LIBRARIES}
+  ${OCTOMAP_INCLUDE_DIRS}
+)
+
+add_executable(A_start src/A_start.cpp)
+add_dependencies(A_start ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(A_start ${catkin_LIBRARIES})
+
+add_executable(generate_map src/generate_map.cpp)
+add_dependencies(generate_map ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(generate_map ${catkin_LIBRARIES})

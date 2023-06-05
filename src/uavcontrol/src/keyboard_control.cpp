@@ -44,8 +44,8 @@ int main(int argc, char *argv[])
     system("stty raw -echo -F" "/dev/tty"); //用于启动键盘监听
 
     //通过这两个服务可以调用模拟器中的无人机起飞和降落命令
-    ros::ServiceClient takeoff_client = nh.serviceClient<uavcontrol::Takeoff>("/airsim_node/drone_1/takeoff");
-    ros::ServiceClient land_client = nh.serviceClient<uavcontrol::Land>("/airsim_node/drone_1/land");
+    ros::ServiceClient takeoff_client = nh.serviceClient<uavcontrol::Takeoff>("/airsim_node/drone1/takeoff");
+    ros::ServiceClient land_client = nh.serviceClient<uavcontrol::Land>("/airsim_node/drone1/land");
 
     // 调用服务前需要定义特定的调用参数
     uavcontrol::Takeoff takeoff;
@@ -54,8 +54,8 @@ int main(int argc, char *argv[])
     land.request.waitOnLastTask = 1;
 
     //通过这两个publisher实现对无人机的速度控制和姿态控制
-    ros::Publisher vel_publisher = nh.advertise<uavcontrol::VelCmd>("airsim_node/drone_1/vel_cmd_body_frame", 1);
-    ros::Publisher pose_publisher = nh.advertise<uavcontrol::PoseCmd>("airsim_node/drone_1/pose_cmd_body_frame", 1);
+    ros::Publisher vel_publisher = nh.advertise<uavcontrol::VelCmd>("airsim_node/drone1/vel_cmd_body_frame", 1);
+    ros::Publisher pose_publisher = nh.advertise<uavcontrol::PoseCmd>("airsim_node/drone1/pose_cmd_body_frame", 1);
 
     // 使用publisher发布速度指令需要定义 Velcmd , 并赋予相应的值后，将他publish（）出去
     uavcontrol::VelCmd velcmd;

@@ -1,16 +1,28 @@
 cmake_minimum_required(VERSION 3.0.2)
+#使用的最低版本
 project(planner)
+#功能包名称  实际上就是这个名字 而不是文件夹名
+
+set(octomap_DIR /opt/ros/noetic/share/octomap)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
+#编译为c++ 11，在ROS Kinetic和更新的版本中支持       Compile（编译）
 # add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
+#查找catkin macros和libraries  库可以理解，但是那个catkin macros是啥
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  tf2
+  tf2_geometry_msgs
+  tf2_ros
+  geometry_msgs
+  pcl_ros
+  octomap
 )
 
 ## System dependencies are found with CMake's conventions
@@ -104,9 +116,10 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES planner
+#  LIBRARIES mapping
 #  CATKIN_DEPENDS roscpp rospy std_msgs
 #  DEPENDS system_lib
+CATKIN_DEPENDS roscpp rospy std_msgs
 )
 
 ###########
@@ -116,13 +129,13 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+  include
   ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/planner.cpp
+#   src/${PROJECT_NAME}/mapping.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -133,7 +146,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/planner_node.cpp)
+# add_executable(${PROJECT_NAME}_node src/mapping_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -197,7 +210,7 @@ include_directories(
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_planner.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_mapping.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

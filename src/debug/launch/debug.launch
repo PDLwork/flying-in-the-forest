@@ -1,0 +1,29 @@
+<launch>
+
+    <!-- 吴！！！ -->
+    <!-- <node pkg="octomap_server" type="octomap_server_node" name="octomap_server" args="$(find yundebug)/map1.bt" output="screen">
+        <param name="frame_id" type="string" value="map" />
+    </node>
+
+    <node pkg="rviz"    type="rviz"                 name=""     args="-d $(find yundebug)/rviz/default.rviz" />
+
+    <node pkg="mapping" type="static_tf_pub"    name=""     output="screen"/>
+
+    <node pkg="mapping" type="drone_tf_pub"     name=""     output="screen"/>
+
+    <node pkg="mapping" type="flight_path_record"   name=""     output="screen"/> -->
+
+    <!-- 云！！！ -->
+    <node pkg="octomap_server" type="octomap_server_node" name="octomap_server" args="$(find yundebug)/map.bt" output="screen">
+        <param name="frame_id" type="string" value="map" />
+    </node>
+
+    <node pkg="rviz"    type="rviz"                 name=""     args="-d $(find yundebug)/rviz/default.rviz" />
+
+    <node pkg="yundebug" type="static_tf"    name=""     output="screen"/>
+    
+    <!-- <node pkg="yundebug" type="RRT_Start_test"            name=""     output="screen"/> -->
+
+    <node pkg="yundebug" type="A_start"            name=""     output="screen"/>
+    
+</launch>  

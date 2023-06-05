@@ -1,45 +1,29 @@
 // 导入标准库
 #include <ros/ros.h>
-// #include <nav_msgs/OccupancyGrid.h>
-// #include <visualization_msgs/Marker.h>
-// #include <geometry_msgs/Point.h>
 #include <random>
-// #include <octomap/octomap.h>
-// #include <octomap/OcTree.h>
-// #include <iostream>
-#include <tf2_ros/transform_listener.h>
-
 
 // 导入消息文件
 #include <nav_msgs/Path.h>
-// #include <octomap_msgs/Octomap.h>
 #include <octomap_msgs/conversions.h>
 #include <visualization_msgs/Marker.h>
 
 using namespace std;
 using namespace octomap;
 
+// 用于存放起点与终点位置
 geometry_msgs::Point current_start, current_end;
-void init111()
-{
-    current_end.x = 0;
-    current_end.y = 0;
-    current_end.z = -1;
-}
 
-// 创建 TF 订阅对象
-// 导入的"tf2_ros/transform_listener.h"
-tf2_ros::Buffer buffer; 
-
+// 发布位置在rviz中显示
 ros::Publisher marker_pub;
 
+// 发布轨迹
 nav_msgs::Path Flight_trajectory;
 ros::Publisher path_pub;
 
-// 定义常量
+// 定义RRT常量
 const double NODE_RADIUS = 2; // 优化的节点半径大小
-const double MIN_DISTANCE = 0.4; // 最小距离
-const int MAX_ITERATIONS = 50000; // 最大迭代次数
+const double MIN_DISTANCE = 0.5; // 最小距离
+const int MAX_ITERATIONS = 5000; // 最大迭代次数
 const double NODE_RADIUS1 = 4; // 优化的节点半径大小
 
 // 定义RRT树结构体
@@ -58,8 +42,8 @@ std::uniform_real_distribution<double> dis1(-1.0, 10.0);
 
 // 定义全局变量
 std::vector<RRTNode> tree; // RRT树
-geometry_msgs::Point start, goal; // 起点和目标点
 
+// 存放地图
 octomap::OcTree* octree;
 
 // 计算两个点之间的距离
@@ -239,8 +223,9 @@ std::vector<geometry_msgs::Point> rrtStar(geometry_msgs::Point start, geometry_m
     tree.push_back(root);
 
     // 迭代添加节点
-    for (int i = 0; i < MAX_ITERATIONS; i++)
+    for (double i = 0; i < MAX_ITERATIONS; i++)
     {
+        // ROS_INFO("%f", i);
         // 在一个长方体中随机生成一个点
         geometry_msgs::Point random_point;
         random_point.x = dis(gen);
@@ -292,6 +277,7 @@ std::vector<geometry_msgs::Point> rrtStar(geometry_msgs::Point start, geometry_m
                         double new_cost = cost + distance(new_point, tree[child].position);
                         if (new_cost < tree[child].cost) 
                         {
+                            // ROS_INFO("!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                             tree[child].parent = tree.size() - 1;   // 也就是最新加入点的索引 
                             tree[child].cost = new_cost;
                         }
@@ -321,85 +307,74 @@ void octomapCallback(const octomap_msgs::Octomap::ConstPtr& msg)
 
 void getGoalCallback(const geometry_msgs::PoseStamped::ConstPtr& msg)
 {
-    try
-    {
-        // geometry_msgs::TransformStamped tfs = buffer.lookupTransform("map_ned","drone_base_link",ros::Time(0), ros::Duration(0.5));
+    // 将上一终点设置为起点
+    current_start.x = current_end.x;
+    current_start.y = current_end.y;
+    current_start.z = current_end.z;
 
-        // geometry_msgs::Point current_start, current_end;
-        // current_start.x = tfs.transform.translation.x;
-        // current_start.y = tfs.transform.translation.y;
-        // current_start.z = tfs.transform.translation.z;
-        
-        current_start.x = current_end.x;
-        current_start.y = current_end.y;
-        current_start.z = current_end.z;
+    current_end.x = msg->pose.position.y;
+    current_end.y = msg->pose.position.x;
+    current_end.z = -(msg->pose.position.z);
 
-        current_end.x = msg->pose.position.y;
-        current_end.y = msg->pose.position.x;
-        current_end.z = -(msg->pose.position.z);
+    // 发布起点 红色
+    visualization_msgs::Marker marker;
+    marker.header.frame_id = "map_ned";
+    marker.header.stamp = ros::Time::now();
+    marker.ns = "basic_shapes";
+    marker.id = 0;
+    marker.type = visualization_msgs::Marker::SPHERE; // Marker类型为点
+    marker.action = visualization_msgs::Marker::ADD;
+    marker.scale.x = 0.5; // 点的大小
+    marker.scale.y = 0.5;
+    marker.scale.z = 0.5;
+    marker.color.r = 1.0; // 颜色
+    marker.color.g = 0.0;
+    marker.color.b = 0.0;
+    marker.color.a = 1.0;
+    marker.pose.orientation.x = 0.0;
+    marker.pose.orientation.y = 0.0;
+    marker.pose.orientation.z = 0.0;
+    marker.pose.orientation.w = 1.0;
 
+    marker.pose.position = current_start;
+    marker_pub.publish(marker); // 发布Marker
 
-        visualization_msgs::Marker marker;
-        marker.header.frame_id = "map_ned";
-        marker.header.stamp = ros::Time::now();
-        marker.ns = "basic_shapes";
-        marker.id = 0;
-        marker.type = visualization_msgs::Marker::SPHERE; // Marker类型为点
-        marker.action = visualization_msgs::Marker::ADD;
-        marker.scale.x = 0.5; // 点的大小
-        marker.scale.y = 0.5;
-        marker.scale.z = 0.5;
-        marker.color.r = 1.0; // 颜色
-        marker.color.g = 0.0;
-        marker.color.b = 0.0;
-        marker.color.a = 1.0;
-        marker.pose.orientation.x = 0.0;
-        marker.pose.orientation.y = 0.0;
-        marker.pose.orientation.z = 0.0;
-        marker.pose.orientation.w = 1.0;
+    // 发布终点 绿色
+    visualization_msgs::Marker marker2;
+    marker2.header.frame_id = "map_ned";
+    marker2.header.stamp = ros::Time::now();
+    marker2.ns = "basic_shapes";
+    marker2.id = 1;
+    marker2.type = visualization_msgs::Marker::SPHERE;
+    marker2.action = visualization_msgs::Marker::ADD;
+    marker2.scale.x = 0.5;
+    marker2.scale.y = 0.5;
+    marker2.scale.z = 0.5;
+    marker2.color.r = 0.0;
+    marker2.color.g = 1.0;
+    marker2.color.b = 0.0;
+    marker2.color.a = 1.0;
+    marker2.pose.orientation.x = 0.0;
+    marker2.pose.orientation.y = 0.0;
+    marker2.pose.orientation.z = 0.0;
+    marker2.pose.orientation.w = 1.0;
 
-        marker.pose.position = current_start;
-        marker_pub.publish(marker); // 发布Marker
+    marker2.pose.position = current_end;
+    marker_pub.publish(marker2); // 发布Marker
 
+    // 将终点加入轨迹中
+    Flight_trajectory.poses.clear();
+    geometry_msgs::PoseStamped current_position_end;
+    current_position_end.pose.position = current_end;
+    Flight_trajectory.poses.push_back(current_position_end);
 
-        visualization_msgs::Marker marker2;
-        marker2.header.frame_id = "map_ned";
-        marker2.header.stamp = ros::Time::now();
-        marker2.ns = "basic_shapes";
-        marker2.id = 1;
-        marker2.type = visualization_msgs::Marker::SPHERE;
-        marker2.action = visualization_msgs::Marker::ADD;
-        marker2.scale.x = 0.5;
-        marker2.scale.y = 0.5;
-        marker2.scale.z = 0.5;
-        marker2.color.r = 0.0;
-        marker2.color.g = 1.0;
-        marker2.color.b = 0.0;
-        marker2.color.a = 1.0;
-        marker2.pose.orientation.x = 0.0;
-        marker2.pose.orientation.y = 0.0;
-        marker2.pose.orientation.z = 0.0;
-        marker2.pose.orientation.w = 1.0;
-
-        marker2.pose.position = current_end;
-        marker_pub.publish(marker2); // 发布Marker
-
-        Flight_trajectory.poses.clear();
-        geometry_msgs::PoseStamped current_position_end;
-        current_position_end.pose.position = current_end;
-        Flight_trajectory.poses.push_back(current_position_end);
-
-        std::vector<geometry_msgs::Point> current_path = rrtStar(current_start, current_end);
-        
-        Flight_trajectory.header.frame_id = "map_ned";
-        Flight_trajectory.header.stamp = ros::Time::now();
-        path_pub.publish(Flight_trajectory);
-    }
-    catch(const std::exception& e)
-    {
-        // std::cerr << e.what() << '\n';
-        ROS_INFO("error:%s",e.what());  
-    }
+    // 输入起点终点，调用RRT算法
+    std::vector<geometry_msgs::Point> current_path = rrtStar(current_start, current_end);
+    
+    // 发布轨迹结果
+    Flight_trajectory.header.frame_id = "map_ned";
+    Flight_trajectory.header.stamp = ros::Time::now();
+    path_pub.publish(Flight_trajectory);
 }
 
 int main(int argc, char **argv) 
@@ -409,7 +384,9 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "rrt_star_planner"); 
     ros::NodeHandle nh;
 
-    init111();
+    current_end.x = 0;
+    current_end.y = 0;
+    current_end.z = -1;
 
     // tf2_ros::TransformListener listener(buffer);
 

@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     ros::Publisher Flight_trajectory_pub = nh.advertise<nav_msgs::Path>("/flight_path_record", 10);
 
     nav_msgs::Path Flight_trajectory;
-    Flight_trajectory.header.frame_id = "world_ned";
+    Flight_trajectory.header.frame_id = "map_ned";
 
     ros::Rate rate(5);
 
@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
     {
         try
         {
-            geometry_msgs::TransformStamped tfs = buffer.lookupTransform("world_ned","drone_1/odom_local_ned",ros::Time(0), ros::Duration(0.5));
+            geometry_msgs::TransformStamped tfs = buffer.lookupTransform("map_ned","drone_base_link",ros::Time(0), ros::Duration(0.5));
 
             geometry_msgs::PoseStamped current_position;
             current_position.pose.position.x = tfs.transform.translation.x;

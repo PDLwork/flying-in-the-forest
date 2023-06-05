@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.0.2)
 project(mapping)
 #功能包名称  实际上就是这个名字 而不是文件夹名
 
+set(octomap_DIR /opt/ros/noetic/share/octomap)
+
 ## Compile as C++11, supported in ROS Kinetic and newer
 #编译为c++ 11，在ROS Kinetic和更新的版本中支持       Compile（编译）
 # add_compile_options(-std=c++11)
@@ -20,7 +22,12 @@ find_package(catkin REQUIRED COMPONENTS
   tf2_ros
   geometry_msgs
   pcl_ros
+  # octomap
 )
+
+# link_directories(${OCTOMAP_LIBRARY_DIRS})
+# include_directories(${OCTOMAP_INCLUDE_DIRS})
+# target_link_libraries(${OCTOMAP_LIBRARIES})
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -215,13 +222,9 @@ include_directories(
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 
-add_executable(gps2xyz src/gps2xyz.cpp src/gps.cpp)
-add_dependencies(gps2xyz ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(gps2xyz ${catkin_LIBRARIES})
-
-add_executable(get_imu src/get_imu.cpp)
-add_dependencies(get_imu ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(get_imu ${catkin_LIBRARIES})
+add_executable(drone_tf_pub src/drone_tf_pub.cpp src/gps.cpp)
+add_dependencies(drone_tf_pub ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(drone_tf_pub ${catkin_LIBRARIES})
 
 add_executable(mapping src/mapping.cpp)
 add_dependencies(mapping ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
@@ -231,6 +234,6 @@ add_executable(flight_path_record src/flight_path_record.cpp)
 add_dependencies(flight_path_record ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(flight_path_record ${catkin_LIBRARIES})
 
-add_executable(tf_tree src/tf_tree.cpp)
-add_dependencies(tf_tree ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(tf_tree ${catkin_LIBRARIES})
+add_executable(static_tf_pub src/static_tf_pub.cpp)
+add_dependencies(static_tf_pub ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(static_tf_pub ${catkin_LIBRARIES})

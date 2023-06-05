@@ -2,31 +2,14 @@
 
     <param name="/take_off_flag"    value="0" />
 
-    <node pkg="rviz"    type="rviz"                 name=""     args="-d $(find mapping)/rviz/default.rviz" />
+    <node pkg="mapping" type="static_tf_pub"    name=""     output="screen"/>
 
-    <node pkg="mapping" type="mapping"              name=""     output="screen"/>
+    <node pkg="mapping" type="drone_tf_pub"     name=""     output="screen"/>
 
-    <node pkg="mapping" type="flight_path_record"   name=""     output="screen"/>
+    <!-- <node pkg="mapping" type="mapping"          name=""     output="screen"/> -->
 
-    <node pkg="mapping" type="tf_tree"              name=""     output="screen"/>
+    <!-- <node pkg="mapping" type="get_goal.py"      name=""     output="screen"/> -->
 
-    <!-- octomap的launch文件 -->
-    <node pkg="octomap_server" type="octomap_server_node" name="octomap_server">
-        <!-- 体素的分辨率 -->
-        <param name="resolution" value="0.2" />
-        <!-- 这个东西有点离谱，设置成world_ned那么订阅的点云就是合并的世界点云地图，只能增加不能减少，设置成map并且给tf关系就可以显示增量地图 -->
-        <param name="frame_id" type="string" value="map" />
-        <!-- <param name="frame_id" type="string" value="world_ned" /> -->
-        <!-- 订阅pointcloud2消息的话题 -->
-        <!-- <remap from="cloud_in" to="/world_map/pointcloud" /> -->
-        <remap from="cloud_in" to="/Lidar/pointcloud" />
-        <!-- 最大的传感器数据，用来滤波 单位：米 -->
-        <!-- <param name="sensor_model/max_range" value="20.0" /> -->
-        <!-- <param name="latch" value="true" /> -->
-        <!-- 最大和最小的地图高度 -->
-        <!-- <param name="pointcloud_max_z" value="1000" /> -->
-        <!-- <param name="pointcloud_min_z" value="-1000" /> -->
-        <!-- <param name="ground_filter_angle" value="3.14" /> -->
-    </node>
+    <!-- <node pkg="planner" type="RRT_Start"            name=""     output="screen"/> -->
 
-</launch>  
+</launch>
