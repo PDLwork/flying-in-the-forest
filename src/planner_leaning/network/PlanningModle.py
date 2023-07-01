@@ -115,7 +115,7 @@ class MobileNetV3(torch.nn.Module):
 
         # 224x224x3 conv2d 3 -> 16 SE=False HS s=2
         self.first_conv = torch.nn.Sequential(
-            torch.nn.Conv2d(in_channels=3, out_channels=16, kernel_size=3, stride=2, padding=1),
+            torch.nn.Conv2d(in_channels=5, out_channels=16, kernel_size=3, stride=2, padding=1),
             torch.nn.BatchNorm2d(16),
             HardSwish(inplace=True),
         )
@@ -231,21 +231,9 @@ class PlannigNet(torch.nn.Module):
     def __init__(self):
         super().__init__()
 
-        self.LGMD_Backbone = torch.nn.Sequential(
+        self.Image_Backbone = torch.nn.Sequential(
             # Conv1d可以理解为一个长方形的2d卷积
             # 输入320*240的图像
-            MobileNetV3(32),
-            torch.nn.Conv1d(in_channels=160, out_channels=128, kernel_size=2, stride=1),
-            torch.nn.LeakyReLU(),
-            torch.nn.Conv1d(in_channels=128, out_channels=64, kernel_size=2, stride=1),
-            torch.nn.LeakyReLU(),
-            torch.nn.Conv1d(in_channels=64, out_channels=64, kernel_size=2, stride=1),
-            torch.nn.LeakyReLU(),
-            torch.nn.Conv1d(in_channels=64, out_channels=32, kernel_size=2, stride=1),
-            torch.nn.LeakyReLU()
-        )
-
-        self.Depth_Backbone = torch.nn.Sequential(
             MobileNetV3(32),
             torch.nn.Conv1d(in_channels=160, out_channels=128, kernel_size=2, stride=1),
             torch.nn.LeakyReLU(),
@@ -264,28 +252,42 @@ class PlannigNet(torch.nn.Module):
             torch.nn.LeakyReLU(negative_slope=0.5),
             torch.nn.Conv1d(in_channels=32, out_channels=32, kernel_size=3, stride=1, padding=1),
             torch.nn.LeakyReLU(negative_slope=0.5),
-            torch.nn.Conv1d(in_channels=32, out_channels=32, kernel_size=3, stride=1, padding=1),
-            # 这一步还有点疑问 要不要留呢？
             torch.nn.Conv1d(in_channels=32, out_channels=32, kernel_size=3, stride=1, padding=1)
         )
 
-    def forward(self, input_LGMD, input_Depth, input_State):
-        LGMD_output = self.LGMD_Backbone(input_LGMD)
-        Depth_output = self.Depth_Backbone(input_Depth)
-        State_output = self.State_Backbone(input_State)
+        self.Planning_Backbone = torch.nn.Sequential(
+            torch.nn.Conv1d(in_channels=32, out_channels=64, kernel_size=1, stride=1),
+            torch.nn.LeakyReLU(negative_slope=0.5),
+            torch.nn.Conv1d(in_channels=64, out_channels=128, kernel_size=1, stride=1),
+            torch.nn.LeakyReLU(negative_slope=0.5),
+            torch.nn.Conv1d(in_channels=128, out_channels=128, kernel_size=1, stride=1),
+            torch.nn.LeakyReLU(negative_slope=0.5),
+            torch.nn.Conv1d(in_channels=128, out_channels=10, kernel_size=1, stride=1)
+        )
+
+        self.pos = torch.nn.Linear(in_features=65*10,out_features=3*10)
+
+    def forward(self, input_Image, input_State):
+        Image_output = self.Image_Backbone(input_Image)     # torch.Size([B, 32, 45])
+        State_output = self.State_Backbone(input_State)     # torch.Size([B, 32, 20])
         # 原文有换通道顺序的
         # State_output = State_output.permute(0,2,1)
+        # 将两部分的框架拼接在一起
+        Planning_tensor = torch.cat((Image_output, State_output), dim=2)    # torch.Size([B, 32, 65])
+        position_feature = self.Planning_Backbone(Planning_tensor)    # torch.Size([B, 10, 65])
+        position_feature = position_feature.view(position_feature.size(0), -1)   # torch.Size([1, 1280])
+        position = self.pos(position_feature)
+        # position = self.pos(position_feature[:, 0, :])
 
-        return LGMD_output, Depth_output, State_output
+        return position
 
 # 验证网络的正确性
 if __name__ == '__main__':
     model = PlannigNet()
-    # print(model)
 
-    input1 = torch.rand((32, 3, 224, 224))
-    input2 = torch.rand((32, 3, 224, 224))
+    # 输入复合图像 与1*20的位姿
+    input1 = torch.rand((32, 5, 224, 224))
     input3 = torch.rand((32, 1, 20))
 
-    LGMD_output, Depth_output, State_output = model(input1, input2, input3)
-    print(LGMD_output.shape, Depth_output.shape, State_output.shape)
+    output = model(input1, input3)
+    print(output.shape)
