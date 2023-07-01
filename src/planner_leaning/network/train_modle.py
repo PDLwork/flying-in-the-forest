@@ -7,8 +7,6 @@ class Mynet(torch.nn.Module):
 
         unknow_channel = 32
 
-        self.MobileNet_Backbone = torchvision.models.mobilenet_v3_small(weights=torchvision.models.MobileNet_V3_Small_Weights.DEFAULT)
-
         self.LGMD_Backbone = torch.nn.Sequential(
             # Conv1d可以理解为一个长方形的2d卷积
             # 输入320*240的图像
@@ -60,12 +58,14 @@ class Mynet(torch.nn.Module):
 
 # 一般在这里验证网络的正确性
 if __name__ == "__main__":
-    Test = Mynet()
+    model = Mynet()
+    # print(model)
+
     input1 = torch.rand((64, 320, 240))
     input2 = torch.rand((64, 320, 240))
     input3 = torch.rand((64, 1, 20))
 
-    LGMD_output, Depth_output, State_output = Test(input1, input2, input3)
+    LGMD_output, Depth_output, State_output = model(input1, input2, input3)
     print(LGMD_output.shape, Depth_output.shape, State_output.shape)
 
 
