@@ -57,9 +57,9 @@ ros::Publisher lidar_pointcloud_publisher;      //声明发布对象，这样可
 // 可以多加滤波，先不管先  目前可以用
 void lidar_Callback(const sensor_msgs::PointCloud2::ConstPtr & lidar_msg)
 {
-    int takeoff_flag = ros::param::param("/take_off_flag",0);
-    if (takeoff_flag)
-    {
+    // int takeoff_flag = ros::param::param("/take_off_flag",0);
+    // if (takeoff_flag)
+    // {
         // try用来调试是否读取到雷达的位姿，读取不到就跳过
         try
         {
@@ -134,7 +134,7 @@ void lidar_Callback(const sensor_msgs::PointCloud2::ConstPtr & lidar_msg)
             // std::cerr << e.what() << '\n';
             ROS_INFO("error:%s",e.what());
         }
-    }
+    // }
 }
 
 int main(int argc, char *argv[])
@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
     ros::NodeHandle nh;
     
     // 订阅来自雷达的消息
-    ros::Subscriber person_info_sub = nh.subscribe("/airsim_node/drone1/lidar/LidarSensor", 10, lidar_Callback);
+    ros::Subscriber person_info_sub = nh.subscribe("/airsim_node/drone/lidar/LidarSensor", 10, lidar_Callback);
 
     // 用于发布世界雷达地图
     world_pointcloud_publisher = nh.advertise<sensor_msgs::PointCloud2> ("/world_map/pointcloud", 10);

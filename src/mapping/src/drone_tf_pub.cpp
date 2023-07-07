@@ -141,10 +141,10 @@ int main(int argc, char **argv)
 	ros::NodeHandle nh;
 
 	// 订阅GPS话题
-	ros::Subscriber GPS_sub = nh.subscribe("/airsim_node/drone1/global_gps", 1, gps2nedCallback);
+	ros::Subscriber GPS_sub = nh.subscribe("/airsim_node/drone/global_gps", 1, gps2nedCallback);
 
 	// 订阅IMU话题
-	ros::Subscriber IMU_sub = nh.subscribe("/airsim_node/drone1/imu/imu", 1, getImuCallback);
+	ros::Subscriber IMU_sub = nh.subscribe("/airsim_node/drone/imu/imu", 1, getImuCallback);
 
 	// 等待循环
 	ros::spin();

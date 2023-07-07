@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
     tfs_lidar2drone.child_frame_id = "lidar";
     tfs_lidar2drone.transform.translation.x = 0;
     tfs_lidar2drone.transform.translation.y = 0;
-    tfs_lidar2drone.transform.translation.z = -0.1;
+    tfs_lidar2drone.transform.translation.z = -0.2;
     tfs_lidar2drone.transform.rotation.x = 0;
     tfs_lidar2drone.transform.rotation.y = 0;
     tfs_lidar2drone.transform.rotation.z = 0;
@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
 
     while (ros::ok())
     {
-        
+        ros::spinOnce();
     }
 
     return 0;
